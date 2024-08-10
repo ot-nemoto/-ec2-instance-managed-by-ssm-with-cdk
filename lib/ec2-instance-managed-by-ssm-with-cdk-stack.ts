@@ -32,6 +32,7 @@ export class Ec2InstanceManagedBySsmWithCdkStack extends cdk.Stack {
 
     // EC2 インスタンスの作成
     new ec2.Instance(this, 'instance', {
+      instanceName: 'ec2-instance-managed-by-ssm-with-cdk',
       vpc,
       instanceType: ec2.InstanceType.of(
         ec2.InstanceClass.T2,

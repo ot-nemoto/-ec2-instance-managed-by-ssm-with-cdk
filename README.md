@@ -1,14 +1,25 @@
-# Welcome to your CDK TypeScript project
+# ec2-instance-managed-by-ssm-with-cdk
 
-This is a blank project for CDK development with TypeScript.
+- SSM で管理するプライベートネットワークのインスタンスを作成する
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+## デプロイ
 
-## Useful commands
+### 事前準備
 
-* `npm run build`   compile typescript to js
-* `npm run watch`   watch for changes and compile
-* `npm run test`    perform the jest unit tests
-* `npx cdk deploy`  deploy this stack to your default AWS account/region
-* `npx cdk diff`    compare deployed stack with current state
-* `npx cdk synth`   emits the synthesized CloudFormation template
+```sh
+export AWS_ACCESS_KEY_ID=
+export AWS_SECRET_ACCESS_KEY=
+export AWS_DEFAULT_REGION=
+```
+
+### インフラストラクチャの作成
+
+```sh
+npx cdk deploy
+```
+
+### インフラストラクチャの削除
+
+```sh
+npx cdk destroy
+```
