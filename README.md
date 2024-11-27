@@ -15,11 +15,11 @@ export AWS_DEFAULT_REGION=
 ### インフラストラクチャの作成
 
 ```sh
-npx cdk deploy
+npm run cdk deploy
 ```
 
 ### インフラストラクチャの削除
 
 ```sh
-npx cdk destroy
+npm run cdk destroy
 ```

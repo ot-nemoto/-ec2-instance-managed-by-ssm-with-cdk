@@ -12,28 +12,46 @@ export class Ec2InstanceManagedBySsmWithCdkStack extends cdk.Stack {
       maxAzs: 2, // 可用性ゾーンの最大数
       ipAddresses: ec2.IpAddresses.cidr('10.0.0.0/16'), // VPC の CIDR ブロック
       subnetConfiguration: [
+        // NATを配置するためのパブリックサブネット
         {
           cidrMask: 24,
-          name: 'private-subnet',
+          name: 'public-subnet',
+          subnetType: ec2.SubnetType.PUBLIC,
+        },
+        // エンドポイントを配置するためのプライベートサブネット
+        // NATが有効な場合はエンドポイント不要ため、このサブネットはなくてもいい
+        {
+          cidrMask: 24,
+          name: 'private-isolated-subnet',
           subnetType: ec2.SubnetType.PRIVATE_ISOLATED,
         },
+        {
+          cidrMask: 24,
+          name: 'private-with-egress-subnet',
+          subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
+        },
       ],
-      natGateways: 0, // NAT ゲートウェイの数を 0 に設定
+      natGateways: 1,
     });
-    vpc.addInterfaceEndpoint('ssm', {
-      service: ec2.InterfaceVpcEndpointAwsService.SSM,
-    });
-    vpc.addInterfaceEndpoint('ssmmessages', {
-      service: ec2.InterfaceVpcEndpointAwsService.SSM_MESSAGES,
-    });
-    vpc.addInterfaceEndpoint('ec2messages', {
-      service: ec2.InterfaceVpcEndpointAwsService.EC2_MESSAGES,
-    });
+    // NATが有効な場合はエンドポイント不要
+    // vpc.addInterfaceEndpoint('ssm', {
+    //   service: ec2.InterfaceVpcEndpointAwsService.SSM,
+    //   subnets: { subnetType: ec2.SubnetType.PRIVATE_ISOLATED },
+    // });
+    // vpc.addInterfaceEndpoint('ssmmessages', {
+    //   service: ec2.InterfaceVpcEndpointAwsService.SSM_MESSAGES,
+    //   subnets: { subnetType: ec2.SubnetType.PRIVATE_ISOLATED },
+    // });
+    // vpc.addInterfaceEndpoint('ec2messages', {
+    //   service: ec2.InterfaceVpcEndpointAwsService.EC2_MESSAGES,
+    //   subnets: { subnetType: ec2.SubnetType.PRIVATE_ISOLATED },
+    // });
 
     // EC2 インスタンスの作成
     new ec2.Instance(this, 'instance', {
       instanceName: 'ec2-instance-managed-by-ssm-with-cdk',
       vpc,
+      vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
       instanceType: ec2.InstanceType.of(
         ec2.InstanceClass.T2,
         ec2.InstanceSize.MICRO
